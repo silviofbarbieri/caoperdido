@@ -1,3 +1,4 @@
+@@ -0,0 +1,581 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -226,30 +227,42 @@
             messagingSenderId: "123456789012",
             appId: "1:123456789012:web:abc123def456"
         };
-           // Inicialize o Firebase
-            const app = initializeApp(firebaseConfig);
-            const database = getDatabase(app);
-                // Simulação de banco de dados com localStorage
-
-import { ref, set } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
-
-function saveToFirebaseDB(dogData) {
-    const id = Date.now().toString();
-    const dbRef = ref(database, 'lostDogs/' + id);
-    return set(dbRef, dogData).then(() => ({ id }));
-}
         
-import { ref, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
-
-function getFromFirebaseDB() {
-    const dbRef = ref(database, 'lostDogs');
-    return get(dbRef).then(snapshot => {
-        if (snapshot.exists()) {
-            return Object.values(snapshot.val());
+        // Simulação de banco de dados com localStorage
+        function saveToLocalDB(data) {
+            // Obter dados existentes
+            let dogs = JSON.parse(localStorage.getItem('lostDogs') || '[]');
+            
+            // Adicionar novo registro
+            dogs.push(data);
+            
+            // Salvar de volta ao localStorage
+            localStorage.setItem('lostDogs', JSON.stringify(dogs));
+            
+            return Promise.resolve({ id: Date.now().toString() });
         }
-        return [];
-    });
-}
+        
+        function getFromLocalDB() {
+            return Promise.resolve(JSON.parse(localStorage.getItem('lostDogs') || '[]'));
+        }
+        
+        // Troca de abas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remover classe ativa de todas as abas
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Adicionar classe ativa à aba clicada
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                
+                // Se a aba for "listar", atualizar a lista
+                if (tab.dataset.tab === 'list') {
+                    loadDogs();
+                }
+            });
+        });
         
         // Adicionar evento ao clicar no mapa
         map.on('click', function(e) {
